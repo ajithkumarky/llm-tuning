@@ -1,0 +1,11 @@
+vllm
+jupyter
+jupyterlab
+graphviz
+matplotlib
+networkx
+chromadb
+sentence-transformers
+dspy
+openai
+ipywidgets
