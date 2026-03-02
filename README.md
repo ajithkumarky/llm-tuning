@@ -29,18 +29,29 @@ source venv/Scripts/activate  # Windows Git Bash
 pip install -r requirements.txt
 ```
 
-### 3. Start vLLM server (in a separate terminal)
+### 3. Start vLLM server (requires WSL2 on Windows)
 
-**On Linux / WSL2:**
+vLLM requires Linux. On Windows, run the server inside **WSL2**:
+
 ```bash
+# In WSL2 terminal:
+python3 -m venv ~/rlm-venv
+source ~/rlm-venv/bin/activate
+pip install vllm
+
 python -m vllm.entrypoints.openai.api_server \
-    --model Qwen/Qwen3-1.7B-AWQ \
+    --model Orion-zhen/Qwen3-1.7B-AWQ \
     --quantization awq \
-    --max-model-len 4096 \
+    --dtype float16 \
+    --max-model-len 2048 \
+    --gpu-memory-utilization 0.80 \
+    --enforce-eager \
     --port 8000
 ```
 
-> **Note:** vLLM requires Linux. On Windows, use WSL2 to run the server. The Jupyter notebooks on Windows connect to `http://localhost:8000` which WSL2 forwards automatically.
+Wait until you see "Application startup complete". WSL2 forwards port 8000 to Windows automatically.
+
+> **Flags explained:** `--enforce-eager` disables Triton compilation (needed for newer GPUs like RTX 5070). `--gpu-memory-utilization 0.80` leaves headroom for other processes. `--dtype float16` is required for AWQ quantization.
 
 ### 4. Launch Jupyter
 

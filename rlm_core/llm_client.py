@@ -1,4 +1,5 @@
 """Thin wrapper around OpenAI-compatible API for local vLLM models."""
+import re
 from dataclasses import dataclass
 from openai import OpenAI
 
@@ -9,6 +10,11 @@ class CompletionResult:
     text: str
     prompt_tokens: int
     completion_tokens: int
+
+
+def strip_thinking_tags(text: str) -> str:
+    """Strip <think>...</think> tags from model output (e.g., Qwen3)."""
+    return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
 
 
 class LLMClient:
@@ -44,8 +50,9 @@ class LLMClient:
             stop=stop,
         )
 
+        raw_text = response.choices[0].message.content
         result = CompletionResult(
-            text=response.choices[0].message.content,
+            text=strip_thinking_tags(raw_text),
             prompt_tokens=response.usage.prompt_tokens,
             completion_tokens=response.usage.completion_tokens,
         )
